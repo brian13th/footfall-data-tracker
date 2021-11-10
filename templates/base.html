@@ -28,5 +28,10 @@
    <!-- Bootstrap js -->
    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js"></script>
+  <script>
+    $("[id=alert-dashboard]").fadeTo(2000, 500).slideUp(500, function(){
+        $("#alert-dashboard").slideUp(500);
+    });
+  </script>
   </body>
 </html>

@@ -3,14 +3,44 @@
 
 {% block scripts %}
     <script>
-    let rawData = [{% for footfall in footfalls %}'{{footfall.footsteps|safe}}',{% endfor %}];
-    console.log(rawData)
+        {% if display == 'raw' %}
+            let backgroundcolor = []
+            let bordercolor = []
+            let rawData = [{% for footfall in footfalls %}'{{footfall.footsteps|safe}}',{% endfor %}];
+            rawData.forEach( footfall => {
+                if(footfall < {{mean}}){
+                    backgroundcolor.push('rgba(255, 99, 132, 0.2)')
+                    bordercolor.push('rgba(255, 99, 132, 1)')
+                } else {
+                    backgroundcolor.push('rgba(41, 241, 195, 0.2)')
+                    bordercolor.push('rgba(41, 241, 195, 1)')
+                }
+            });
+        {% endif %}
+        {% if display == 'normalize' %}
+            let backgroundcolor = []
+            let bordercolor = []
+            let rawData = [{% for footstep in footsteps %}'{{footstep}}',{% endfor %}];
+            rawData.forEach( footstep => {
+                if(footstep < {{mean}}){
+                    backgroundcolor.push('rgba(255, 99, 132, 0.2)')
+                    bordercolor.push('rgba(255, 99, 132, 1)')
+                } else {
+                    backgroundcolor.push('rgba(41, 241, 195, 0.2)')
+                    bordercolor.push('rgba(41, 241, 195, 1)')
+                }
+            });
+        {% endif %}
         $(document).ready( function(){
             const ctx = document.getElementById('myChart').getContext('2d');
             const myChart = new Chart(ctx, {
                 type: '{{chart}}',
                 data: {
+                    {% if display == 'raw' %}
                     labels: [{% for footfall in footfalls %}'{{footfall.time|date:"M d"}}',{% endfor %}],
+                    {% elif display == 'normalize' %}
+                    labels: [{% for day in dates %}'{{day|date:"M d"}}',{% endfor %}],
+                    {% endif %}
                     datasets: [{
                         label: '# of Footfalls',
                         {% if display == 'raw' %}
@@ -18,8 +48,8 @@
                         {% elif display == 'normalize' %}
                         data: [{% for footstep in footsteps %}'{{footstep}}',{% endfor %}],
                         {% endif %}
-                        backgroundColor: 'rgba(41, 241, 195, 0.2)',
-                        borderColor: 'rgba(41, 241, 195, 1)',
+                        backgroundColor: backgroundcolor,
+                        borderColor: bordercolor,
                         borderWidth: 1
                     }]
                 },
@@ -34,9 +64,16 @@
         });
     </script>
 {% endblock scripts %}
+
 {% block content %}
+mean{{mean}}
 <div class="container">
     <div class="row">
+        {% for message in messages %}
+          <div id='alert-dashboard' class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" style="{text-align:center;}" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
         <form class="col-md-2" action="" method="POST">
             {% csrf_token %}
             {{search_form|crispy}}

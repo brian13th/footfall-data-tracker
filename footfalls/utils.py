@@ -1,6 +1,7 @@
 import pandas as pd
 from .models import Footfall
 import datetime
+from django.db.models.query import QuerySet
 
 def footfalls_from_csv_to_db():
     Footfall.objects.all().delete()
@@ -28,3 +29,13 @@ def get_data_to_display(data, data_type):
         data_df = pd.DataFrame(data.values())
         data_df['footsteps_normalized'] = (data_df['footsteps'] / data_df['footsteps'].max() * 100).round(decimals=2)
         return data_df
+
+def get_yearly_average_footfall(data):
+    if isinstance(data, QuerySet):
+        data_df = pd.DataFrame(data.values())
+        # mean = int((data_df['footsteps'].mean()).round(decimals=0))
+        data_df['time'] = pd.to_datetime(data_df.time)
+        mean = data_df.groupby(data_df.time.dt.year)['footsteps'].transform('mean').mean()
+    else:
+        mean = int(round((sum(data)/len(data)),0))
+    return mean
