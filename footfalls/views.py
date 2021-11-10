@@ -3,11 +3,10 @@ from .utils import footfalls_from_csv_to_db, get_chart_type, get_data_to_display
 from .models import Footfall
 from .forms import SearchForm
 from django.contrib import messages
-# Create your views here.
 
 def dashboard_home(request):
     search_form = SearchForm(request.POST or None)
-    # footfalls_from_csv_to_db()
+    # footfalls_from_csv_to_db() #run this function if data base is empty to load data
     footfalls = Footfall.objects.all()
     chart = 'bar' # default chart type value
     display = 'raw' # default data to display
@@ -19,8 +18,8 @@ def dashboard_home(request):
         date_to = request.POST.get('date_to')
         chart_type = request.POST.get('chart_type')
         display = request.POST.get('display_chart_by')
-
         footfalls_qs = Footfall.objects.filter(time__date__gte=date_from, time__date__lte=date_to)
+
         if len(footfalls_qs)>0:
             messages.success(request, "successful submission!")
             footfalls = get_data_to_display(footfalls_qs, display)
