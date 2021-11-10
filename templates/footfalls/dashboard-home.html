@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block scripts %}
+    <script>
+    let rawData = [{% for footfall in footfalls %}'{{footfall.footsteps|safe}}',{% endfor %}];
+    console.log(rawData)
+        $(document).ready( function(){
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: '{{chart}}',
+                data: {
+                    labels: [{% for footfall in footfalls %}'{{footfall.time|date:"M d"}}',{% endfor %}],
+                    datasets: [{
+                        label: '# of Footfalls',
+                        {% if display == 'raw' %}
+                        data: [{% for footfall in footfalls %}'{{footfall.footsteps}}',{% endfor %}],
+                        {% elif display == 'normalize' %}
+                        data: [{% for footstep in footsteps %}'{{footstep}}',{% endfor %}],
+                        {% endif %}
+                        backgroundColor: 'rgba(41, 241, 195, 0.2)',
+                        borderColor: 'rgba(41, 241, 195, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock scripts %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <form class="col-md-2" action="" method="POST">
+            {% csrf_token %}
+            {{search_form|crispy}}
+            <button type="submit" class="btn btn-primary mt-3">Search</button>
+        </form>
+        <canvas id="myChart" class="col-md-6" width="400" height="100%"></canvas>
+    </div>
+</div>
+{% endblock content %}
