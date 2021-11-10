@@ -3,34 +3,20 @@
 
 {% block scripts %}
     <script>
-        {% if display == 'raw' %}
-            let backgroundcolor = []
-            let bordercolor = []
-            let rawData = [{% for footfall in footfalls %}'{{footfall.footsteps|safe}}',{% endfor %}];
-            rawData.forEach( footfall => {
-                if(footfall < {{mean}}){
-                    backgroundcolor.push('rgba(255, 99, 132, 0.2)')
-                    bordercolor.push('rgba(255, 99, 132, 1)')
-                } else {
-                    backgroundcolor.push('rgba(41, 241, 195, 0.2)')
-                    bordercolor.push('rgba(41, 241, 195, 1)')
-                }
-            });
-        {% endif %}
-        {% if display == 'normalize' %}
-            let backgroundcolor = []
-            let bordercolor = []
-            let rawData = [{% for footstep in footsteps %}'{{footstep}}',{% endfor %}];
-            rawData.forEach( footstep => {
-                if(footstep < {{mean}}){
-                    backgroundcolor.push('rgba(255, 99, 132, 0.2)')
-                    bordercolor.push('rgba(255, 99, 132, 1)')
-                } else {
-                    backgroundcolor.push('rgba(41, 241, 195, 0.2)')
-                    bordercolor.push('rgba(41, 241, 195, 1)')
-                }
-            });
-        {% endif %}
+        let backgroundcolor = []
+        let bordercolor = []
+        let labels = []
+        {% if display == 'raw' %} let rawData = [{% for footfall in footfalls %}'{{footfall.footsteps|safe}}',{% endfor %}];{% endif %}
+        {% if display == 'normalize' %} let rawData = [{% for footstep in footsteps %}'{{footstep}}',{% endfor %}];{% endif %}
+        rawData.forEach( footfall => {
+            if(footfall < {{mean}}){
+                backgroundcolor.push('rgba(255, 99, 132, 0.2)')
+                bordercolor.push('rgba(255, 99, 132, 1)')
+            } else {
+                backgroundcolor.push('rgba(41, 241, 195, 0.2)')
+                bordercolor.push('rgba(41, 241, 195, 1)')
+            }
+        });
         $(document).ready( function(){
             const ctx = document.getElementById('myChart').getContext('2d');
             const myChart = new Chart(ctx, {
